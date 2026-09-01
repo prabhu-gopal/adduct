@@ -27,6 +27,7 @@ from typing import Any
 import numpy as np
 
 from adduct._arrays import FloatArray
+from adduct.adapters.base import MissingExtraError
 from adduct.ir.episode import LazyImage
 
 
@@ -43,7 +44,7 @@ def _av() -> Any:
     try:
         import av
     except ImportError as exc:  # pragma: no cover - exercised only without the extra
-        raise ImportError("decoding video requires the optional dependency: pip install 'adduct[video]'") from exc
+        raise MissingExtraError("decoding video requires the optional dependency: pip install 'adduct[video]'") from exc
     return av
 
 

@@ -23,7 +23,7 @@ import numpy as np
 
 from adduct._arrays import AnyArray
 from adduct.adapters._arraysource import ArraySourceHandle
-from adduct.adapters.base import Adapter, DatasetHandle
+from adduct.adapters.base import Adapter, DatasetHandle, MissingExtraError
 from adduct.config import ScanConfig
 
 if TYPE_CHECKING:
@@ -40,7 +40,9 @@ def _h5py() -> Any:
     try:
         import h5py
     except ImportError as exc:  # pragma: no cover - exercised only without the extra
-        raise ImportError("reading HDF5 datasets requires the optional dependency: pip install 'adduct[hdf5]'") from exc
+        raise MissingExtraError(
+            "reading HDF5 datasets requires the optional dependency: pip install 'adduct[hdf5]'"
+        ) from exc
     return h5py
 
 

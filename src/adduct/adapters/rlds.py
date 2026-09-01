@@ -28,7 +28,7 @@ import numpy as np
 from adduct._arrays import AnyArray
 from adduct.adapters._arraysource import _as_1d, _as_2d, _ImageFrames
 from adduct.adapters._mapping import ArrayInfo, infer_mapping
-from adduct.adapters.base import Adapter, DatasetHandle, Sampler
+from adduct.adapters.base import Adapter, DatasetHandle, MissingExtraError, Sampler
 from adduct.config import ScanConfig
 from adduct.ir.episode import Episode, StepView, TaskLabel
 from adduct.ir.schema import ActionSpace, CameraSpec, DatasetSchema, Provenance, SchemaHints
@@ -43,7 +43,7 @@ def _tfds() -> Any:
     try:
         import tensorflow_datasets as tfds
     except ImportError as exc:  # pragma: no cover - exercised only without the extra
-        raise ImportError(
+        raise MissingExtraError(
             "reading RLDS/TFDS datasets requires the optional dependency: pip install 'adduct[rlds]'"
         ) from exc
     return tfds
@@ -217,7 +217,9 @@ class RldsAdapter(Adapter):
 
     def open(self, path: Path, config: ScanConfig) -> DatasetHandle:
         if not _available():
-            raise ImportError("this looks like an RLDS/TFDS dataset; reading it requires: pip install 'adduct[rlds]'")
+            raise MissingExtraError(
+                "this looks like an RLDS/TFDS dataset; reading it requires: pip install 'adduct[rlds]'"
+            )
         return _RldsHandle(path, config, self.name)
 
 

@@ -39,6 +39,25 @@ def test_a_missing_path_prints_a_message_not_a_traceback(capsys: pytest.CaptureF
     assert "owner/name" in captured.err  # and the next thing to try
 
 
+def test_an_install_hint_keeps_its_extra(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+    """A ``pip install 'adduct[rlds]'`` hint must survive rendering with its extra intact.
+
+    Rich parses square brackets as style markup, so an unescaped ``adduct[rlds]`` renders
+    as a bare ``adduct`` — telling users to install the package they already have, and
+    deleting the one word that would have fixed it. This pins the whole class: every
+    optional-dependency hint travels the same ``err.print(f"[red]error[/red] {exc}")`` path.
+    """
+    pytest.importorskip  # noqa: B018 - documents that this path needs TensorFlow absent
+    (tmp_path / "features.json").write_text(json.dumps({"steps": {"action": {"shape": [7]}}}), encoding="utf-8")
+    (tmp_path / "dataset_info.json").write_text(json.dumps({"name": "demo"}), encoding="utf-8")
+    code = main(["scan", str(tmp_path)])
+    captured = capsys.readouterr()
+    assert code == 2
+    assert "Traceback" not in captured.err
+    normalized = " ".join(captured.err.split())  # rich soft-wraps at the console width
+    assert "adduct[rlds]" in normalized, f"the extra was swallowed: {normalized!r}"
+
+
 def test_an_unrecognized_directory_names_the_format_escape_hatch(
     capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:

@@ -25,6 +25,7 @@ from typing import Any
 import numpy as np
 
 from adduct._arrays import FloatArray
+from adduct.adapters.base import MissingExtraError
 
 _MODEL = "dinov2_vits14"
 _PATCH = 14
@@ -46,7 +47,7 @@ class DinoV2Encoder:
             try:
                 import torch
             except ImportError as exc:  # pragma: no cover - depends on optional extra
-                raise RuntimeError(
+                raise MissingExtraError(
                     "The dinov2 encoder requires the vision extra: pip install 'adduct[vision]'"
                 ) from exc
             model = torch.hub.load("facebookresearch/dinov2", self._model_name)
