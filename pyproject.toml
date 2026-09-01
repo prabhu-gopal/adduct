@@ -65,8 +65,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://adduct.com"
-Documentation = "https://adduct.com/docs"
+Homepage = "https://bohrin.com/adduct"
+Documentation = "https://bohrin.com/adduct/docs"
 Source = "https://github.com/prabhu-gopal/adduct"
 
 [project.scripts]
