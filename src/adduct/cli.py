@@ -16,9 +16,11 @@ from pathlib import Path
 
 import yaml
 from rich.console import Console
+from rich.markup import escape
 from rich.progress import BarColumn, Progress, SpinnerColumn, TaskID, TextColumn, TimeElapsedColumn
 
 from adduct.adapters._mapping import UnmappableDatasetError
+from adduct.adapters.base import MissingExtraError
 from adduct.adapters.registry import UnknownFormatError
 from adduct.api import scan
 from adduct.config import DEFAULT_FPR, ScanConfig
@@ -50,6 +52,10 @@ _USER_ERRORS = (
     UnknownTargetError,
     HubUnavailableError,
     FileNotFoundError,
+    # An uninstalled extra is a fixable input, not a crash: the message is a pip command.
+    # Deliberately the MissingExtraError subclass and not bare ImportError, so a genuinely
+    # broken install still surfaces as the traceback it is.
+    MissingExtraError,
 )
 
 _STAGE_LABEL = {"fetch": "fetching from the Hub", "profile": "building profile", "detect": "running detectors"}
@@ -225,7 +231,7 @@ def _build_parser() -> argparse.ArgumentParser:
 def _cmd_scan(args: argparse.Namespace, console: Console, err: Console) -> int:
     if args.lang != "en" and not is_supported(args.lang):
         err.print(
-            f"[yellow]note[/yellow] --lang {args.lang}: no catalog for that language yet "
+            f"[yellow]note[/yellow] --lang {escape(args.lang)}: no catalog for that language yet "
             f"(have: {', '.join(supported_languages())}); rendering in English.",
             highlight=False,
         )
@@ -255,7 +261,7 @@ def _cmd_scan(args: argparse.Namespace, console: Console, err: Console) -> int:
         # unmappable schema, a bad checkpoint. Each already carries an actionable message,
         # so print it plainly. A traceback here would be noise on the most common first-run
         # mistake and would read as a crash in our tool rather than a fixable input.
-        err.print(f"[red]error[/red] {exc}", highlight=False)
+        err.print(f"[red]error[/red] {escape(str(exc))}", highlight=False)
         return 2
     if args.json_path:
         report.to_json(args.json_path)
@@ -291,7 +297,7 @@ def _warn_if_vision_skipped(report: Report, args: argparse.Namespace, err: Conso
     )
     err.print(
         f"[yellow]note[/yellow] {len(report.dataset.cameras)} camera(s) detected but not "
-        f"analyzed — {hint}. Pass --no-vision to silence.",
+        f"analyzed — {escape(hint)}. Pass --no-vision to silence.",
         highlight=False,
     )
 
@@ -328,7 +334,7 @@ def _cmd_calibrate(args: argparse.Namespace, console: Console, err: Console) -> 
     try:
         result = build_corpus(args.paths, base=base, force=args.force)
     except _USER_ERRORS as exc:
-        err.print(f"[red]error[/red] {exc}", highlight=False)
+        err.print(f"[red]error[/red] {escape(str(exc))}", highlight=False)
         return 2
 
     for skipped in result.skipped:
@@ -394,7 +400,7 @@ def _cmd_explain(detector_id: str, console: Console, err: Console) -> int:
             console.print(f"[bold]{det.id}[/bold]  [dim]({det.family.value})[/dim]")
             console.print(det.explain())
             return 0
-    err.print(f"[red]unknown detector:[/red] {detector_id}")
+    err.print(f"[red]unknown detector:[/red] {escape(detector_id)}")
     return 1
 
 

@@ -23,6 +23,16 @@ if TYPE_CHECKING:
     from adduct.config import ScanConfig
 
 
+class MissingExtraError(ImportError):
+    """An optional extra is not installed, and the message says which one to install.
+
+    Distinct from a bare ``ImportError`` so the CLI can print it as a user error — "run
+    this pip command" — instead of a traceback, without also swallowing a genuine broken
+    install. It subclasses ``ImportError`` so existing ``except ImportError`` callers,
+    including the Python API's, keep working unchanged.
+    """
+
+
 @dataclass(frozen=True, slots=True)
 class Sampler:
     """Deterministic episode subsampling for triage runs (docs/02 §7).

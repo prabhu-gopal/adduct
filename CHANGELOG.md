@@ -9,6 +9,29 @@ any `--json` output. It changes only when the serialized report shape changes.
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-09-01
+
+Fixes two bugs on the optional-dependency path — the moment a user is most stuck, and
+until now the moment the tool was least helpful. Both were found by installing from PyPI
+and running the tool, not by the test suite, which exercised these paths only in-process.
+
+### Fixed
+
+- **Every "install this extra" hint was deleting the extra.** Messages travel through
+  `rich`, which parses square brackets as style markup, so `pip install 'adduct[rlds]'`
+  rendered as `pip install 'adduct'` — telling users to install the package they already
+  have, and silently removing the one word that would have fixed it. All four extras were
+  affected (`rlds`, `zarr`, `hdf5`, `video`), plus the `adduct[vision]` encoder hint and
+  the "cameras detected but not analyzed" note. Interpolated text is now escaped before
+  rendering, and a regression test asserts the extra survives.
+- **An uninstalled extra crashed with a traceback instead of printing the fix.** Scanning
+  an RLDS/TFDS dataset without `adduct[rlds]` raised a bare `ImportError` that no handler
+  caught, so the tool that exists to tell you what is wrong with your data instead looked
+  like it had crashed on it. These now raise `MissingExtraError` and exit 2 with the pip
+  command. It subclasses `ImportError`, so `except ImportError` callers are unaffected,
+  and it is deliberately narrower than catching `ImportError` outright — a genuinely
+  broken install still surfaces as the traceback it is.
+
 ## [0.2.1] — 2026-09-01
 
 The first release published under the name `adduct`.
@@ -175,5 +198,6 @@ First public release.
 - `schema_version` is `1.0` — the first published report contract. Nothing consumed an
   earlier shape, since this was the first released version of adduct.
 
-[Unreleased]: https://github.com/prabhu-gopal/adduct/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/prabhu-gopal/adduct/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/prabhu-gopal/adduct/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/prabhu-gopal/adduct/releases/tag/v0.2.1

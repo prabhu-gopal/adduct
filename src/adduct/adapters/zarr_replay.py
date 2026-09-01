@@ -22,7 +22,7 @@ import numpy as np
 
 from adduct._arrays import AnyArray
 from adduct.adapters._arraysource import ArraySourceHandle
-from adduct.adapters.base import Adapter, DatasetHandle
+from adduct.adapters.base import Adapter, DatasetHandle, MissingExtraError
 from adduct.config import ScanConfig
 
 _DATA_GROUP = "data"
@@ -34,7 +34,7 @@ def _zarr() -> Any:
     try:
         import zarr
     except ImportError as exc:  # pragma: no cover - exercised only without the extra
-        raise ImportError(
+        raise MissingExtraError(
             "reading Zarr replay buffers requires the optional dependency: pip install 'adduct[zarr]'"
         ) from exc
     return zarr
