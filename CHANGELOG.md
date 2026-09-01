@@ -9,6 +9,14 @@ any `--json` output. It changes only when the serialized report shape changes.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The package metadata pointed Homepage and Documentation at a parked domain.**
+  `adduct.com` is not ours: it serves a redirect to a domain-sale lander, and both
+  links were live on the PyPI project page. They now point at `bohrin.com/adduct`.
+  The URLs were introduced by a mechanical rename and were never verified to
+  resolve to anything we control.
+
 ## [0.2.2] — 2026-09-01
 
 Fixes two bugs on the optional-dependency path — the moment a user is most stuck, and
