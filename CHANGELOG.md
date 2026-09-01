@@ -9,6 +9,10 @@ any `--json` output. It changes only when the serialized report shape changes.
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-09-01
+
+The first release published under the name `adduct`.
+
 ### Added
 
 - **A default scan now says that the policy↔data checks were skipped**, and names the flags
@@ -171,6 +175,5 @@ First public release.
 - `schema_version` is `1.0` — the first published report contract. Nothing consumed an
   earlier shape, since this was the first released version of adduct.
 
-[Unreleased]: https://github.com/prabhu-gopal/adduct/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/prabhu-gopal/adduct/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/prabhu-gopal/adduct/releases/tag/v0.1.0
+[Unreleased]: https://github.com/prabhu-gopal/adduct/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/prabhu-gopal/adduct/releases/tag/v0.2.1
